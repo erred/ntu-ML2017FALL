@@ -15,4 +15,4 @@ for i in range(0, width):
         image_new.putpixel((i,j), (int(pix[0]/2), int(pix[1]/2), int(pix[2]/2)))
 
 
-image_new.save("Q2.jpg")
+image_new.save("Q2.png")

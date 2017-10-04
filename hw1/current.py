@@ -65,8 +65,8 @@ def predict(values):
     s = bias
     for h in range(0,9):
         for i in range(0,18):
-            s += weights[0][i] * values[i][h] + weights[1][i] * values[i][h] * values[i][h]
-    return max(round(s), 0)
+            s += weights[h][i] * values[i][h]
+    return s
 
 
 
@@ -88,7 +88,7 @@ def train(arr, outputFile):
         for day in arr:
             weights_g = []
             bias_g = 0.0
-            for j in range(0,2):
+            for j in range(0,9):
                 w = []
                 for i in range(0,18):
                     w.append(float(0))
@@ -99,21 +99,21 @@ def train(arr, outputFile):
                 diff = day[MAGIC][12+i] - pred
                 loss += diff ** 2
                 bias_g -= diff * 2
-                for j in range(0,18):
-                    weights_g[0][j] -= 2 * diff * sum(day[j][3+i:12+i])
-                    weights_g[1][j] -= 2 * diff * sum(day[j][3+i:12+i]) * weights[1][j]
+                for h in range(0,9):
+                    for j in range(0,18):
+                        weights_g[h][j] -= 2 * diff * day[j][h+i+3]
             bias_l += bias_g **2
             bias -= learn_rate / math.sqrt(bias_l) * bias_g
             # bias -= learn_rate / math.log(bias_l) * bias_g
-            for k in range(0,2):
+            for k in range(0,9):
                 for j in range(0,18):
                     weights_l[k][j] += weights_g[k][j] ** 2
                     weights[k][j] -= learn_rate / math.sqrt(weights_l[k][j]) * weights_g[k][j]
                     # weights[k][j] -= learn_rate / math.log(weights_l[k][j]) * weights_g[k][j]
         print(loss)
         if counter % 100 == 0:
-            savemodel("model/chkpt3-" + str(counter) + "-" + str(int(loss)))
-    savemodel(outputFile + "-" + str(counter) + "-" + str(int(loss)))
+            savemodel("model/chkpt5-" + str(int(loss)) + "-" + str(counter))
+    savemodel("model/m5-" + str(int(loss)) + "-" + str(counter))
 
 
 def test(arr, outputFile):
@@ -121,6 +121,7 @@ def test(arr, outputFile):
     for day in arr:
         section = [day[k][2:] for k in range(0,18)]
         pred = predict(section)
+        pred = max(round(pred), 0)
         out = [day[0][0], pred]
         results.append(out)
         print(out)
@@ -132,18 +133,18 @@ def test(arr, outputFile):
 
 
 random.seed()
-learn_rate = 0.1
+learn_rate = 10
 weights = []
-for j in range(0,2):
+for j in range(0,9):
     w = []
     for i in range(0,18):
-        # w.append(random.random() -0.5)
-        w.append(float(0.5))
+        # w.append((random.random() -0.5)/1000)
+        w.append(float(0))
     weights.append(w)
-# bias = random.random()
+# bias = 0.0
 bias = random.random()
 weights_l = []
-for j in range(0,2):
+for j in range(0,9):
     w = []
     for i in range(0,18):
         w.append(float(1))

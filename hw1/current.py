@@ -13,13 +13,11 @@ def readTestData(inputFile):
         reader = csv.reader(inf)
         for row in reader:
             #id, param, 9
-            if row[0] == lastid:
-                tarr.append(row[:2] + [float(r) if r != 'NR' else 0 for r in row[2:]])
-            else:
+            if row[0] != lastid:
                 arr.append(tarr)
                 tarr = []
                 lastid = row[0]
-                tarr.append(row[:2] + [float(r) if r != 'NR' else 0 for r in row[2:]])
+            tarr.append(row[:2] + [float(r) if r != 'NR' else 0 for r in row[2:]])
         arr.append(tarr)
     return arr[1:]
 
@@ -32,13 +30,11 @@ def readTrainData(inputFile):
         reader = csv.reader(inf)
         next(reader, None)
         for row in reader:
-            if row[0] == lastid:
-                tarr.append(row[:3] + [float(r) if r != 'NR' else 0 for r in row[3:]])
-            else:
+            if row[0] != lastid:
                 arr.append(tarr)
                 tarr = []
                 lastid = row[0]
-                tarr.append(row[:3] + [float(r) if r != 'NR' else 0 for r in row[3:]])
+            tarr.append(row[:3] + [float(r) if r != 'NR' else 0 for r in row[3:]])
         arr.append(tarr)
     return arr[1:]
 
@@ -76,14 +72,10 @@ def train(arr, outputFile):
     global bias_l
     global weights_l
     MAGIC = 9
-    # last_loss2 = 10000000000000000
-    # last_loss = 1000000000000000
     loss = 100000000000000
     counter = 0
     while(loss > 100000):
         counter += 1
-        # last_loss2 = last_loss
-        # last_loss = loss
         loss = 0
         for day in arr:
             weights_g = []
@@ -104,16 +96,14 @@ def train(arr, outputFile):
                         weights_g[h][j] -= 2 * diff * day[j][h+i+3]
             bias_l += bias_g **2
             bias -= learn_rate / math.sqrt(bias_l) * bias_g
-            # bias -= learn_rate / math.log(bias_l) * bias_g
             for k in range(0,9):
                 for j in range(0,18):
                     weights_l[k][j] += weights_g[k][j] ** 2
                     weights[k][j] -= learn_rate / math.sqrt(weights_l[k][j]) * weights_g[k][j]
-                    # weights[k][j] -= learn_rate / math.log(weights_l[k][j]) * weights_g[k][j]
         print(loss)
         if counter % 100 == 0:
-            savemodel("model/chkpt5-" + str(int(loss)) + "-" + str(counter))
-    savemodel("model/m5-" + str(int(loss)) + "-" + str(counter))
+            savemodel("model/cp" + outputFile + "-" + str(int(loss)) + "-" + str(counter))
+    savemodel("model/m" + outputFile + "-" + str(int(loss)) + "-" + str(counter))
 
 
 def test(arr, outputFile):
@@ -133,22 +123,20 @@ def test(arr, outputFile):
 
 
 random.seed()
+
 learn_rate = 10
+
 weights = []
-for j in range(0,9):
-    w = []
-    for i in range(0,18):
-        # w.append((random.random() -0.5)/1000)
-        w.append(float(0))
-    weights.append(w)
-# bias = 0.0
-bias = random.random()
 weights_l = []
 for j in range(0,9):
     w = []
+    w_l = []
     for i in range(0,18):
-        w.append(float(1))
-    weights_l.append(w)
+        w.append(float(0))
+        w_l.append(float(1))
+    weights.append(w)
+    weights_l.append(w_l)
+bias = 0.0
 bias_l = 1.0
 
 def main(mode, inputFile, outputFile, modelFile):
@@ -167,5 +155,4 @@ if __name__ == "__main__":
     inputFile = sys.argv[2]
     outputFile = sys.argv[3]
     modelFile = sys.argv[4]
-
     main(mode, inputFile, outputFile, modelFile)

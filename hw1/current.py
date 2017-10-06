@@ -2,8 +2,6 @@ import csv
 import sys
 import math
 import random
-# import numpy as np
-# import scipy as sp
 
 def readTestData(inputFile):
     arr = []
@@ -12,7 +10,6 @@ def readTestData(inputFile):
     with open(inputFile, 'r') as inf:
         reader = csv.reader(inf)
         for row in reader:
-            #id, param, 9
             if row[0] != lastid:
                 arr.append(tarr)
                 tarr = []
@@ -26,7 +23,6 @@ def readTrainData(inputFile):
     lastid = ""
     tarr = []
     with open(inputFile, 'r', encoding='latin1') as inf:
-        #id, ???, param, 24
         reader = csv.reader(inf)
         next(reader, None)
         for row in reader:
@@ -36,14 +32,21 @@ def readTrainData(inputFile):
                 lastid = row[0]
             tarr.append(row[:3] + [float(r) if r != 'NR' else 0 for r in row[3:]])
         arr.append(tarr)
-    return arr[1:]
+    out = [d[3:] for d in arr[1]]
+    for d in arr[2:]:
+        for i in range(0,18):
+            out[i].extend(d[i][3:])
+    out2 = []
+    for i in range(0,5760, 480):
+        out2.append([r[i:i+480] for r in out])
+    return out2
 
 def savemodel(outputFile):
     print("saving: ", outputFile)
     with open(outputFile, 'w') as of:
         writer = csv.writer(of)
         writer.writerow([bias])
-        writer.writerows(weights)
+        writer.writerow(weights)
 
 def loadModel(modelFile):
     global weights
@@ -52,16 +55,15 @@ def loadModel(modelFile):
         reader = csv.reader(inf)
         row = next(reader)
         bias = float(row[0])
-        counter = 0
-        for row in reader:
-            weights[counter] = [float(r) for r in row]
-            counter += 1
+        row = next(reader)
+        weights = [float(r) for r in row]
 
 def predict(values):
     s = bias
     for h in range(0,9):
-        for i in range(0,18):
-            s += weights[h][i] * values[i][h]
+        i=9
+        s += weights[h] * values[i][h]
+        s += weights[h+9] * values[i][h] ** 2
     return s
 
 
@@ -74,33 +76,32 @@ def train(arr, outputFile):
     MAGIC = 9
     loss = 100000000000000
     counter = 0
-    while(loss > 100000):
+    while(loss > 100):
         counter += 1
         loss = 0
-        for day in arr:
+        avgl = []
+        for month in arr:
             weights_g = []
             bias_g = 0.0
-            for j in range(0,9):
-                w = []
-                for i in range(0,18):
-                    w.append(float(0))
-                weights_g.append(w)
-            for i in range(0,24-9):
-                section = [day[k][3+i:12+i] for k in range(0,18)]
+            for j in range(0,18):
+                weights_g.append(0.0)
+
+            for i in range(0,480-9):
+                section = [month[k][i:9+i] for k in range(0,18)]
                 pred = predict(section)
-                diff = day[MAGIC][12+i] - pred
+                diff = month[MAGIC][9+i] - pred
                 loss += diff ** 2
                 bias_g -= diff * 2
                 for h in range(0,9):
-                    for j in range(0,18):
-                        weights_g[h][j] -= 2 * diff * day[j][h+i+3]
+                    weights_g[h] -= 2 * diff * month[9][h+i]
+                    weights_g[h+9] -= 2 * diff * month[9][h+i] ** 2
             bias_l += bias_g **2
-            bias -= learn_rate / math.sqrt(bias_l) * bias_g
-            for k in range(0,9):
-                for j in range(0,18):
-                    weights_l[k][j] += weights_g[k][j] ** 2
-                    weights[k][j] -= learn_rate / math.sqrt(weights_l[k][j]) * weights_g[k][j]
-        print(loss)
+            bias -= learn_rate * bias_g
+            bias -= learn_rate /bias_l * bias_g
+            for k in range(0,18):
+                weights_l[k] += weights_g[k] ** 2
+                weights[k] -= learn_rate / math.sqrt(weights_l[k]) * weights_g[k]
+        print(loss, math.sqrt(loss/(471*12)))
         if counter % 100 == 0:
             savemodel("model/cp" + outputFile + "-" + str(int(loss)) + "-" + str(counter))
     savemodel("model/m" + outputFile + "-" + str(int(loss)) + "-" + str(counter))
@@ -111,7 +112,7 @@ def test(arr, outputFile):
     for day in arr:
         section = [day[k][2:] for k in range(0,18)]
         pred = predict(section)
-        pred = max(round(pred), 0)
+        pred = max(pred, 0)
         out = [day[0][0], pred]
         results.append(out)
         print(out)
@@ -121,27 +122,19 @@ def test(arr, outputFile):
             writer.writerows(results)
 
 
-
-random.seed()
-
-learn_rate = 10
+learn_rate = 0.001
 
 weights = []
 weights_l = []
-for j in range(0,9):
-    w = []
-    w_l = []
-    for i in range(0,18):
-        w.append(float(0))
-        w_l.append(float(1))
-    weights.append(w)
-    weights_l.append(w_l)
+for j in range(0,18):
+    weights.append(0.0)
+    weights_l.append(1.0)
 bias = 0.0
 bias_l = 1.0
 
 def main(mode, inputFile, outputFile, modelFile):
     if mode == "train":
-        # loadModel(outputFile)
+        loadModel(outputFile)
         data = readTrainData(inputFile)
         train(data, modelFile)
         savemodel(outputFile)

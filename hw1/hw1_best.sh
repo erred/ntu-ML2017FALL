@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 current.py "test" "$1" "$2" current.model
+python3 best.py best.model "$1" "$2"

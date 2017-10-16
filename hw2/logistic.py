@@ -78,7 +78,7 @@ def predOut(xdata, outputFile):
         for i,x in enumerate(pred):
             w.writerow([i+1,int(x)])
 
-LEARNRATE = 20
+LEARNRATE = 25
 weights = np.zeros([106])
 weights_l = np.zeros([106])
 weights2 = np.zeros([106])

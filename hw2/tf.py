@@ -64,7 +64,7 @@ def test(X_test, est, outputFile):
         w = csv.writer(of)
         w.writerow(["id", "label"])
         for i,x in enumerate([p["class_ids"].tolist() for p in arr]):
-            w.writerow([i+1, x])
+            w.writerow([i+1, x[0]])
 
 
 

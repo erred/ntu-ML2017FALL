@@ -74,6 +74,7 @@ bias_l = 0.0
 if __name__ == "__main__":
     if sys.argv[1] == "train":
         # train X_train, Y_train, modelFile
+        loader(sys.argv[5])
         Xdata = np.genfromtxt(sys.argv[2], dtype=np.float32, skip_header=1, delimiter=',')
         Ydata = np.genfromtxt(sys.argv[3], dtype=np.float32, skip_header=1, delimiter=',')
         train(Xdata, Ydata, 300, sys.argv[4])

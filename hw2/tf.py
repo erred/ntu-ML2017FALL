@@ -7,7 +7,7 @@ import tensorflow as tf
 tf.logging.set_verbosity(tf.logging.INFO)
 
 STEPS = (254 * 10000)
-VERSION = 2
+VERSION = 3
 
 feature_columns = [tf.feature_column.numeric_column("x", shape=[106])]
 
@@ -23,7 +23,7 @@ dnn = tf.estimator.DNNClassifier(hidden_units=[64,128,64],
 linednn = tf.estimator.DNNLinearCombinedClassifier(model_dir="model/tf-dw-"+str(VERSION),
                                                    linear_feature_columns=feature_columns,
                                                    dnn_feature_columns=feature_columns,
-                                                   dnn_hidden_units=[32,64,32],
+                                                   dnn_hidden_units=[64,8,32,4],
                                                    n_classes=2)
 
 
@@ -46,9 +46,9 @@ def train(X_train, Y_train, est, steps):
         linednn.train(train_fn, steps=100000)
         print(linednn.evaluate(eval_fn))
 
-def test(X_test, outputFile):
+def test(X_test, est, outputFile):
     t_d = np.genfromtxt(X_test, dtype=np.float32, skip_header=1, delimiter=',')
-    t = {"x": x_d}
+    t = {"x": t_d}
     test_fn = tf.estimator.inputs.numpy_input_fn(x=t, shuffle=False)
     if est == "linear":
         pred = linear.predict(test_fn)
@@ -59,7 +59,13 @@ def test(X_test, outputFile):
     elif est == "linednn":
         pred = linednn.predict(test_fn)
         arr = [p for p in pred]
-    print(arr)
+
+    with open(outputFile, 'w') as of:
+        w = csv.writer(of)
+        w.writerow(["id", "label"])
+        for i,x in enumerate([p["class_ids"].tolist() for p in arr]):
+            w.writerow([i+1, x])
+
 
 
 
@@ -74,4 +80,4 @@ if __name__ == "__main__":
     else:
         T = sys.argv[3]
         outputFile = sys.argv[4]
-        test(T, outputFile)
+        test(T, est,  outputFile)

@@ -15,7 +15,7 @@ linear = tf.estimator.LinearClassifier(feature_columns=feature_columns,
                                        model_dir="model/tf-wide-"+str(VERSION),
                                        n_classes=2)
 
-dnn = tf.estimator.DNNClassifier(hidden_units=[64,128,64],
+dnn = tf.estimator.DNNClassifier(hidden_units=[20],
                                  feature_columns=feature_columns,
                                  model_dir="model/tf-deep-" +str(VERSION),
                                  n_classes=2)
@@ -23,7 +23,7 @@ dnn = tf.estimator.DNNClassifier(hidden_units=[64,128,64],
 linednn = tf.estimator.DNNLinearCombinedClassifier(model_dir="model/tf-dw-"+str(VERSION),
                                                    linear_feature_columns=feature_columns,
                                                    dnn_feature_columns=feature_columns,
-                                                   dnn_hidden_units=[64,8,32,4],
+                                                   dnn_hidden_units=[40],
                                                    n_classes=2)
 
 
@@ -37,13 +37,13 @@ def train(X_train, Y_train, est, steps):
     eval_fn = tf.estimator.inputs.numpy_input_fn(x=x,y=y, num_epochs=1, shuffle=False)
 
     if est == "linear":
-        linear.train(train_fn, steps=100000)
+        linear.train(train_fn, steps=1000000)
         print(linear.evaluate(eval_fn))
     elif est == "dnn":
-        dnn.train(train_fn, steps=100000)
+        dnn.train(train_fn, steps=1000000)
         print(dnn.evaluate(eval_fn))
     elif est == "linednn":
-        linednn.train(train_fn, steps=100000)
+        linednn.train(train_fn, steps=1000000)
         print(linednn.evaluate(eval_fn))
 
 def test(X_test, est, outputFile):

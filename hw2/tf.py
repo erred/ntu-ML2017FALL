@@ -7,7 +7,7 @@ import tensorflow as tf
 tf.logging.set_verbosity(tf.logging.INFO)
 
 STEPS = (254 * 10000)
-VERSION = 4
+VERSION = 5
 
 feature_columns = [tf.feature_column.numeric_column("x", shape=[106])]
 
@@ -24,15 +24,32 @@ dnn = tf.estimator.DNNClassifier(hidden_units=[128, 32],
 linednn = tf.estimator.DNNLinearCombinedClassifier(model_dir="model/tf-dw-" + str(VERSION),
                                                    linear_feature_columns=feature_columns,
                                                    dnn_feature_columns=feature_columns,
-                                                   dnn_hidden_units=[128, 32],
+                                                   dnn_hidden_units=[128, 64],
                                                    n_classes=2)
+
+col_filter = []
+col_filter.append(list(range(0, 1)))  # age
+col_filter.append(list(range(1, 2)))  # fnlwgt
+col_filter.append(list(range(2, 3)))  # sex
+col_filter.append(list(range(3, 4)))  # capital_gain
+col_filter.append(list(range(4, 5)))  # capital_loss
+col_filter.append(list(range(5, 6)))  # hours_per_week
+col_filter.append(list(range(6, 15)))  # employer
+col_filter.append(list(range(15, 22)))  # edu_num
+col_filter.append(list(range(22, 31)))  # edu
+col_filter.append(list(range(31, 38)))  # maritial
+# col_filter.append(list(range(38,53))) # occupation
+col_filter.append(list(range(53, 59)))  # relationship
+# col_filter.append(list(range(59,64))) # race
+col_filter.append(list(range(64, 106)))  # country
 
 
 def train(X_train, Y_train, est, steps):
     x_d = np.genfromtxt(X_train, dtype=np.float32,
                         skip_header=1, delimiter=',')
     x = {"x": x_d}
-    y = np.genfromtxt(Y_train, dtype=np.float32, skip_header=1, delimiter=',')
+    y = np.genfromtxt(Y_train, dtype=np.float32, skip_header=1,
+                      delimiter=',', usecols=col_filter)
 
     train_fn = tf.estimator.inputs.numpy_input_fn(
         x=x, y=y, shuffle=True, num_epochs=None)
@@ -51,7 +68,8 @@ def train(X_train, Y_train, est, steps):
 
 
 def test(X_test, est, outputFile):
-    t_d = np.genfromtxt(X_test, dtype=np.float32, skip_header=1, delimiter=',')
+    t_d = np.genfromtxt(X_test, dtype=np.float32,
+                        skip_header=1, delimiter=',', usecols=col_filter)
     t = {"x": t_d}
     test_fn = tf.estimator.inputs.numpy_input_fn(x=t, shuffle=False)
     if est == "linear":

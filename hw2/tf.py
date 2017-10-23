@@ -25,7 +25,7 @@ col_filter.append(list(range(64, 106)))  # country
 col_filter = sum(col_filter, [])
 
 FEATURES = len(col_filter)
-EPOCHS = 100
+EPOCHS = 1000
 VERSION = 8
 
 feature_columns = [tf.feature_column.numeric_column("x", shape=[FEATURES])]

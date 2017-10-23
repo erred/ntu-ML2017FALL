@@ -9,18 +9,18 @@ import iofn
 tf.logging.set_verbosity(tf.logging.INFO)
 
 col_filter = []
-# col_filter.append(list(range(0, 1)))  # age
-# col_filter.append(list(range(1, 2)))  # fnlwgt
-# col_filter.append(list(range(2, 3)))  # sex
-# col_filter.append(list(range(3, 5)))  # capital gain/loss
-# col_filter.append(list(range(5, 6)))  # hours_per_week
-# col_filter.append(list(range(6, 15)))  # employer
-# col_filter.append(list(range(15, 22)))  # edu_num
-# col_filter.append(list(range(22, 31)))  # edu
-# col_filter.append(list(range(31, 38)))  # maritial
-# col_filter.append(list(range(38,53))) # occupation
+col_filter.append(list(range(0, 1)))  # age
+col_filter.append(list(range(1, 2)))  # fnlwgt
+col_filter.append(list(range(2, 3)))  # sex
+col_filter.append(list(range(3, 5)))  # capital gain/loss
+col_filter.append(list(range(5, 6)))  # hours_per_week
+col_filter.append(list(range(6, 15)))  # employer
+col_filter.append(list(range(15, 22)))  # edu_num
+col_filter.append(list(range(22, 31)))  # edu
+col_filter.append(list(range(31, 38)))  # maritial
+col_filter.append(list(range(38,53))) # occupation
 col_filter.append(list(range(53, 59)))  # relationship
-# col_filter.append(list(range(59,64))) # race
+col_filter.append(list(range(59,64))) # race
 col_filter.append(list(range(64, 106)))  # country
 col_filter = sum(col_filter, [])
 

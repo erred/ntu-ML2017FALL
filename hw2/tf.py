@@ -52,7 +52,7 @@ def createEst(est):
             dnn_hidden_units=[128, 64],
             n_classes=2)
 
-def train(X_train, Y_train, est):
+def train(X_train, X_test, Y_train, est):
     x_d, t_d, y_d = iofn.readData(X_train, X_test, Y_train, col_filter)
     x = {"x": x_d}
 
@@ -65,7 +65,7 @@ def train(X_train, Y_train, est):
     print(est.evaluate(eval_fn))
 
 
-def test(X_test, est, outputFile):
+def test(X_train, X_test, Y_train, est, outputFile):
     x_d, t_d, y_d = iofn.readData(X_train, X_test, Y_train, col_filter)
     t = {"x": t_d}
 
@@ -83,12 +83,12 @@ def test(X_test, est, outputFile):
 if __name__ == "__main__":
     mode = sys.argv[1]
     est = createEst(sys.argv[2])
+    X = 'data/X_train'
+    Y = 'data/Y_train'
+    T = 'data/X_test'
 
     if mode == "train":
-        X = sys.argv[3]
-        Y = sys.argv[4]
-        train(X, Y, est)
+        train(X, T, Y, est)
     else:
-        T = sys.argv[3]
-        outputFile = sys.argv[4]
-        test(T, est,  outputFile)
+        outputFile = sys.argv[3]
+        test(X, T, Y, est,  outputFile)

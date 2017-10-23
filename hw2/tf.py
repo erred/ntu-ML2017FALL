@@ -26,7 +26,7 @@ col_filter = sum(col_filter, [])
 
 FEATURES = len(col_filter)
 EPOCHS = 100
-VERSION = 7
+VERSION = 8
 
 feature_columns = [tf.feature_column.numeric_column("x", shape=[FEATURES])]
 
@@ -40,7 +40,7 @@ def createEst(est):
             n_classes=2)
     elif est == "dnn":
         return tf.estimator.DNNClassifier(
-            hidden_units=[128, 32],
+            hidden_units=[96, 32, 8],
             feature_columns=feature_columns,
             model_dir="model/tf-deep-" + str(VERSION),
             n_classes=2)

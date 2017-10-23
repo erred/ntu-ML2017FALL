@@ -6,4 +6,5 @@
 # $4: provided train label (Y_train)
 # $5: provided test feature (X_test)
 # $6: prediction.csv
-python3 logistics.py "$@"
+# python3 gen.py "test" "$3" "$5" "$4" "gen.model" "$6"
+python3 genta.py --infer --train_data_path "$3" --train_label_path "$4" --test_data_path "$5" --output_file "$6"

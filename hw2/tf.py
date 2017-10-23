@@ -26,7 +26,7 @@ col_filter = sum(col_filter, [])
 
 FEATURES = len(col_filter)
 EPOCHS = 100
-VERSION = 6
+VERSION = 7
 
 feature_columns = [tf.feature_column.numeric_column("x", shape=[FEATURES])]
 

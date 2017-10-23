@@ -54,9 +54,9 @@ def createEst(est):
 
 def train(X_train, X_test, Y_train, est):
     x_d, t_d, y_d = iofn.readData(X_train, X_test, Y_train, col_filter)
-    order = np.arange(len(x))
+    order = np.arange(len(x_d))
     np.random.shuffle(order)
-    length = int(len(x) * 0.9)
+    length = int(len(x_d) * 0.9)
     x_s = x_d[order]
     y_s = y_d[order]
     x_s = x_s[:length]

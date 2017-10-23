@@ -57,12 +57,14 @@ def train(X_train, X_test, Y_train, est):
     order = np.arange(len(x_d))
     np.random.shuffle(order)
     length = int(len(x_d) * 0.9)
-    x_s = x_d[order]
-    y_s = y_d[order]
-    x_s = x_s[:length]
-    y_s = y_s[:length]
-    x_e = x_s[length:]
-    y_e = y_s[length:]
+    x_ss = x_d[order]
+    y_ss = y_d[order]
+
+    x_s = x_ss[:length]
+    y_s = y_ss[:length]
+
+    x_e = x_ss[length:]
+    y_e = y_ss[length:]
 
     x_t = {"x": x_e}
     x = {"x": x_s}

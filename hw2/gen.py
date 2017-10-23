@@ -8,16 +8,16 @@ import iofn
 col_filter = []
 col_filter.append(list(range(0, 1)))  # age
 col_filter.append(list(range(1, 2)))  # fnlwgt
-# col_filter.append(list(range(2, 3)))  # sex
+col_filter.append(list(range(2, 3)))  # sex
 col_filter.append(list(range(3, 5)))  # capital gain/loss
 col_filter.append(list(range(5, 6)))  # hours_per_week
 col_filter.append(list(range(6, 15)))  # employer
 col_filter.append(list(range(15, 22)))  # edu_num
 col_filter.append(list(range(22, 31)))  # edu
-# col_filter.append(list(range(31, 38)))  # maritial
+col_filter.append(list(range(31, 38)))  # maritial
 col_filter.append(list(range(38,53))) # occupation
 col_filter.append(list(range(53, 59)))  # relationship
-# col_filter.append(list(range(59,64))) # race
+col_filter.append(list(range(59,64))) # race
 col_filter.append(list(range(64, 106)))  # country
 
 col_filter = sum(col_filter, [])
@@ -89,12 +89,23 @@ if __name__ == "__main__":
     X_train = sys.argv[2]
     X_test = sys.argv[3]
     Y_train = sys.argv[4]
-    x, t, y = iofn.readData(X_train, X_test, Y_train, col_filter)
     modelFile = sys.argv[5]
 
+    x, t, y = iofn.readData(X_train, X_test, Y_train, col_filter)
+    order = np.arange(len(x))
+    np.random.shuffle(order)
+    length = int(len(x) * 0.9)
+    x_s = x[order]
+    y_s = y[order]
+    x_s = x_s[:length]
+    y_s = y_s[:length]
+
+
     if mode == "train":
-        train(x, y)
+        train(x_s, y_s)
         saver(modelFile)
+        output = test(x)
+        print(100 * float(sum([int(y[i] == output[i]) for i in range(len(y))])) / len(y))
     elif mode == "eval":
         weights, bias = loader(modelFile)
         output = test(x)

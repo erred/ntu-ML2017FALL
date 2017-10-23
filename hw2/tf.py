@@ -11,22 +11,22 @@ tf.logging.set_verbosity(tf.logging.INFO)
 col_filter = []
 col_filter.append(list(range(0, 1)))  # age
 col_filter.append(list(range(1, 2)))  # fnlwgt
-col_filter.append(list(range(2, 3)))  # sex
+# col_filter.append(list(range(2, 3)))  # sex
 col_filter.append(list(range(3, 5)))  # capital gain/loss
 col_filter.append(list(range(5, 6)))  # hours_per_week
 col_filter.append(list(range(6, 15)))  # employer
 col_filter.append(list(range(15, 22)))  # edu_num
 col_filter.append(list(range(22, 31)))  # edu
-col_filter.append(list(range(31, 38)))  # maritial
+# col_filter.append(list(range(31, 38)))  # maritial
 col_filter.append(list(range(38,53))) # occupation
 col_filter.append(list(range(53, 59)))  # relationship
-col_filter.append(list(range(59,64))) # race
+# col_filter.append(list(range(59,64))) # race
 col_filter.append(list(range(64, 106)))  # country
 col_filter = sum(col_filter, [])
 
 FEATURES = len(col_filter)
-EPOCHS = 1000
-VERSION = 8
+EPOCHS = 100
+VERSION = 9
 
 feature_columns = [tf.feature_column.numeric_column("x", shape=[FEATURES])]
 
@@ -42,7 +42,7 @@ def createEst(est):
         return tf.estimator.DNNClassifier(
             hidden_units=[96, 32, 8],
             feature_columns=feature_columns,
-            model_dir="model/tf-deep-" + str(VERSION),
+            model_dir="model/ntuim/tf-deep-" + str(VERSION),
             n_classes=2)
     elif est == "linednn":
         return tf.estimator.DNNLinearCombinedClassifier(
@@ -54,12 +54,20 @@ def createEst(est):
 
 def train(X_train, X_test, Y_train, est):
     x_d, t_d, y_d = iofn.readData(X_train, X_test, Y_train, col_filter)
-    x = {"x": x_d}
+    order = np.arange(len(x))
+    np.random.shuffle(order)
+    length = int(len(x) * 0.9)
+    x_s = x_d[order]
+    y_s = y_d[order]
+    x_s = x_s[:length]
+    y_s = y_s[:length]
 
+    x_t = {"x": x_d}
+    x = {"x": x_s}
     train_fn = tf.estimator.inputs.numpy_input_fn(
-        x=x, y=y_d, shuffle=True, num_epochs=EPOCHS)
+        x=x, y=y_s, shuffle=True, num_epochs=EPOCHS)
     eval_fn = tf.estimator.inputs.numpy_input_fn(
-        x=x, y=y_d, num_epochs=1, shuffle=False)
+        x=x_t, y=y_d, num_epochs=1, shuffle=False)
 
     est.train(train_fn)
     print(est.evaluate(eval_fn))

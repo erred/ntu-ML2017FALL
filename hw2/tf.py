@@ -69,7 +69,7 @@ def train(X_train, X_test, Y_train, est):
     train_fn = tf.estimator.inputs.numpy_input_fn(
         x=x, y=y_s, shuffle=True, num_epochs=EPOCHS)
     eval_fn = tf.estimator.inputs.numpy_input_fn(
-        x=x_t, y=y_e, num_epochs=1, shuffle=False)
+        x=x_e, y=y_e, num_epochs=1, shuffle=False)
 
     est.train(train_fn)
     print(est.evaluate(eval_fn))

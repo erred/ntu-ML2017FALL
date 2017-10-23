@@ -49,7 +49,7 @@ def createEst(est):
             model_dir="model/tf-dw-" + str(VERSION),
             linear_feature_columns=feature_columns,
             dnn_feature_columns=feature_columns,
-            dnn_hidden_units=[128, 64],
+            dnn_hidden_units=[64],
             n_classes=2)
 
 def train(X_train, X_test, Y_train, est):
@@ -61,13 +61,15 @@ def train(X_train, X_test, Y_train, est):
     y_s = y_d[order]
     x_s = x_s[:length]
     y_s = y_s[:length]
+    x_e = x_s[length:]
+    y_e = y_s[length:]
 
-    x_t = {"x": x_d}
+    x_t = {"x": x_e}
     x = {"x": x_s}
     train_fn = tf.estimator.inputs.numpy_input_fn(
         x=x, y=y_s, shuffle=True, num_epochs=EPOCHS)
     eval_fn = tf.estimator.inputs.numpy_input_fn(
-        x=x_t, y=y_d, num_epochs=1, shuffle=False)
+        x=x_t, y=y_e, num_epochs=1, shuffle=False)
 
     est.train(train_fn)
     print(est.evaluate(eval_fn))

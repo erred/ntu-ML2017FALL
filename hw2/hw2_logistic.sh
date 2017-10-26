@@ -6,4 +6,4 @@
 # $4: provided train label (Y_train)
 # $5: provided test feature (X_test)
 # $6: prediction.csv
-python3 log.py test "$3" "$5" "$4" log.model "$6"
+python3 log.py test "$3" "$5" "$4" model/log.model "$6"

@@ -80,3 +80,24 @@ def readData(X_train, X_test, Y_train, col_filter=col_filter):
     x_d, t_d = normalize(x_d, t_d)
 
     return x_d, t_d, y_d
+
+def cleanReadData(X_train, X_test, Y_train, col_filter=col_filter):
+    x_d = np.genfromtxt(
+        X_train,
+        dtype=np.float32,
+        skip_header=1,
+        delimiter=',',
+        usecols=col_filter)
+    t_d = np.genfromtxt(
+        X_test,
+        dtype=np.float32,
+        skip_header=1,
+        delimiter=',',
+        usecols=col_filter)
+    y_d = np.genfromtxt(
+        Y_train,
+        dtype=np.float32,
+        skip_header=1,
+        delimiter=',')
+
+    return x_d, t_d, y_d

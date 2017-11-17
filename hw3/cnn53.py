@@ -16,8 +16,8 @@ import iofn
 
 # ========== Hyper
 BATCHSIZE = 128
-STARTEPOCH = 150
-EPOCHS = 250
+STARTEPOCH = 0
+EPOCHS = 160
 MODELDIR = 'model/cnn53/'
 MODELFILE = MODELDIR + 'model'
 

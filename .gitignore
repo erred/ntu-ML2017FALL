@@ -3,3 +3,9 @@ __pycache__/
 data/
 model/
 *.pyc
+
+hw0/
+hw1/
+hw2/
+hw3/
+hw4/

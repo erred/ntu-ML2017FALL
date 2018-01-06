@@ -2,30 +2,28 @@ import sys
 import csv
 import numpy as np
 from sklearn.cluster import KMeans
+import pickle
 
 from keras.layers import Input, Reshape, Conv2D, Flatten, Dense, Conv2DTranspose
-from keras.models import Model
+from keras.models import Model, load_model
 
 input_img = Input(shape=(784, ))
 
-encoded = Reshape([28, 28, 1])(input_img)
-encoded = Conv2D(128, 3, strides=2, padding='same', activation='relu')(encoded)
-encoded = Conv2D(32, 3, strides=2, padding='same', activation='relu')(encoded)
-encoded = Flatten()(encoded)
-encoded = Dense(196, activation='tanh')(encoded)
+encoded = Dense(392, activation='relu')(input_img)
+encoded = Dense(196, activation='relu')(encoded)
+encoded = Dense(49)(encoded)
 
-decoded = Reshape([7, 7, -1])(encoded)
-decoded = Conv2DTranspose(
-    64, 4, strides=2, padding='same', activation='relu')(decoded)
-decoded = Conv2DTranspose(
-    1, 4, strides=2, padding='same', activation='sigmoid')(decoded)
-decoded = Flatten()(decoded)
+# decoded = Dense(196, activation='relu')(encoded)
+# decoded = Dense(392, activation='relu')(decoded)
+# decoded = Dense(784, activation='sigmoid')(decoded)
 
-autoencoder = Model(input_img, decoded)
-autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+# autoencoder = Model(input_img, decoded)
+# autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
 
 # autoencoder.summary()
-autoencoder.load_weights('ae6')
+
+# # autoencoder.summary()
+# autoencoder.load_weights('model/ae-2')
 
 images = np.load(sys.argv[1])
 
@@ -37,8 +35,13 @@ with open(sys.argv[2]) as f:
         cases.append([int(row[1]), int(row[2])])
 
 encoder = Model(input_img, encoded)
+encoder.compile('adam', 'mse')
+encoder.load_weights('enc')
 reduced = encoder.predict(images)
-labels = KMeans(2).fit_predict(reduced)
+# with open('model/km.pkl', 'rb') as f:
+#     km = pickle.load(f)
+km = KMeans(2)
+labels = km.fit_predict(reduced)
 
 with open(sys.argv[3], 'w') as f:
     w = csv.writer(f)
